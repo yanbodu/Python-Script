@@ -1,46 +1,51 @@
-#coding=utf8
+# coding=utf8
+# A Python script to auto-reply message in Wechat
+# @ Yanbo
+
+import requests
 import itchat
+from itchat.content import *
 
-# auto reply
-@itchat.msg_register('Text')
-def text_reply(msg):
+KEY = '8edce3ce905a4c1dbb965e6b35c3834d'
 
+# get response message
+def get_response(msg):
+    # connect with tuling-robot
+    apiUrl = 'http://www.tuling123.com/openapi/api'
+    data = {
+        'key'    : KEY,
+        'info'   : msg,
+        'userid' : 'wechat-robot',
+    }
+    try:
+        r = requests.post(apiUrl, data=data).json()
+        # retrun text from the robot
+        return r.get('text')
+    # return None if cannot connect with server
+    except:
+        return None
+
+# send message
+@itchat.msg_register([PICTURE,TEXT])
+def tuling_reply(msg):
+    # the message from others
     if not msg['FromUserName'] == myUserName:
-
-        message = msg['Text']
-
-        # reply messages
-        if '你好' in message:
-             itchat.send_msg(msg='你好呀[Joyful]\n', toUserName=msg['FromUserName'] )
-        elif '再见' in message:
-            itchat.send_msg(msg='再见[Bye]\n', toUserName=msg['FromUserName'] )
-        elif '...' in message:
-            itchat.send_msg(msg='点什么点[Scold]\n', toUserName=msg['FromUserName'] )
-        elif '你是谁' in message:
-            itchat.send_msg(msg='你猜呀\n', toUserName=msg['FromUserName'] )
-        elif '谁' in message:
-            itchat.send_msg(msg='我是Python回复助手0.0版\n', toUserName=msg['FromUserName'] )
-        elif '呦' in message:
-            itchat.send_msg(msg='呦呦切克闹\n', toUserName=msg['FromUserName'] )
-        elif '我是你爸爸' in message:
-            itchat.send_msg(msg='爸爸没你这个儿子\n', toUserName=msg['FromUserName'] )
-        elif '叫爸爸' in message:
-            itchat.send_msg(msg='儿砸！！\n', toUserName=msg['FromUserName'] )
-        elif '大爷' in message:
-            itchat.send_msg(msg='把你厉害的\n', toUserName=msg['FromUserName'] )
-        elif '傻逼' in message or '尼玛' in message or '麻痹' in message:
-            itchat.send_msg(msg='[Smile]\n', toUserName=msg['FromUserName'] )
-        elif '？' in message:
-            itchat.send_msg(msg='？？？\n', toUserName=msg['FromUserName'] )
-        elif '哈' in message or '嘿' in message:
-            itchat.send_msg(msg='笑屁哦[Smile]\n', toUserName=msg['FromUserName'] )
-
+        # text type message
+        if msg['Type'] == TEXT:
+            # default message
+            defaultReply = 'I received: ' + msg['Text']
+            # tuling AI message
+            reply = get_response(msg['Text'])
+            if reply:
+                itchat.send_msg(msg=reply, toUserName=msg['FromUserName'])
+            else:
+                itchat.send_msg(msg=defaultReply, toUserName=msg['FromUserName'])
+        # None-Text message
         else:
-            itchat.send_msg(msg='我听不懂你在讲什么 略略略\n', toUserName=msg['FromUserName'] )
+            itchat.send_msg(msg='给我发文字啦', toUserName=msg['FromUserName'])
 
 
-if __name__ == '__main__':
-    itchat.auto_login()
-    # own UserName
-    myUserName = itchat.get_friends(update=True)[0]["UserName"]
-    itchat.run()
+# initialization  
+itchat.auto_login(hotReload=True)
+myUserName = itchat.get_friends(update=True)[0]["UserName"]
+itchat.run()
