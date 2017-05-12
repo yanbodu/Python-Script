@@ -1,2 +1,2 @@
-# WeChat-auto-response
-A Python demo to achieve auto-reply in WeChat by using itchat library. 
+# Python——Script
+Python Scripts for fun. 
