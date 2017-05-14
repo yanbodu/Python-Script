@@ -7,15 +7,16 @@ from lxml import html
 import os
 import time
 
-jpgList = []
 
 # main page
-def getPage(pageNum):
-    baseUrl = 'http://www.mzitu.com/page/{}'.format(pageNum)
-    selector = html.fromstring(requests.get(baseUrl).content)
+def getPage(num):
     urls = []
+
+    baseUrl = 'http://www.mzitu.com/page/{}'.format(num)
+    selector = html.fromstring(requests.get(baseUrl).content)
     for i in selector.xpath('//ul[@id="pins"]/li/a/@href'):
         urls.append(i)
+
     return urls
 
 
@@ -26,6 +27,7 @@ def getPiclink(url):
     total =  sel.xpath('//div[@class="pagenavi"]/a[last()-1]/span/text()')[0]
     # Title
     title = sel.xpath('//h2[@class="main-title"]/text()')[0]
+    jpgList = []
     # put url to the list
     for i in range(int(total)):
         # single page
@@ -37,26 +39,19 @@ def getPiclink(url):
         jpgList.append(jpg)
     return jpgList
 
-
 # download pictures
-def downloadPic(piclist):
-    k = 1
-    # number of Picture
-    count = len(piclist)
-    # dir Name
-    dirName = u"[%sP]%s" % (str(count), 'Pictures')
-    # new dir
-    os.mkdir(dirName)
+def downloadPic(piclist, count):
+
     for i in piclist:
         # check website status
         if requests.get(i).status_code == 200:
             # currentPath/dir/fielname
-            filename = '%s/%s/%s.jpg' % (os.path.abspath('.'), dirName, k)
-            print (u'Downloading:%s No.%s' % (dirName, k))
+            filename = '%s/%s.jpg' % (os.path.abspath('.'), count)
+            print (u'Downloading: No.%s' %  count)
             with open(filename, "wb") as jpg:
                 jpg.write(requests.get(i).content)
                 time.sleep(2)
-            k += 1
+            count += 1
         else:
             print ('Crash!!')
             return
@@ -65,9 +60,20 @@ if __name__ == '__main__':
     # ask user for page number to download
     pageNum = input(u'Page Number: ')
 
-    # save pictures in the list
-    for link in getPage(pageNum):
-        getPiclink(link)
+    start =time.clock()
 
-    # download pictures
-    downloadPic(jpgList)
+    num = 0
+    count = 0
+    picture = []
+    for num in range(int(pageNum)):
+        # save pictures in the list
+        for link in getPage(num):
+            picture = getPiclink(link)
+            # download pictures
+            downloadPic(picture, count)
+            count = count + len(picture)
+        num += 1
+
+    end = time.clock()
+
+    print('Running time: %s Seconds'%(end-start))
