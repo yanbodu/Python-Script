@@ -23,11 +23,16 @@ if __name__ == '__main__':
     # click dropdown button
     browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[3]/div/div/span').click()
 
+    # select dept names
+    deptNames = browser.find_elements_by_class_name("dropdown-menu")
+    for dept in deptNames:
+        print(dept.text)
+
     #1-152 department
     i = 2;
     browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[3]/div/div/ul/li[%s]' % i).click()
 
-    # load all prof in th department
+    # load all prof in thw department
     while(1):
         LoadMore = browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[5]/div/div[1]')
         # left side scroll down
@@ -42,7 +47,7 @@ if __name__ == '__main__':
     text = browser.page_source
     soup = BeautifulSoup(text, 'html.parser')
 
-    # select
+    # select prof name
     names = browser.find_elements_by_class_name("result-list")
 
     for name in names:
