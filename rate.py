@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import os
 import time
 
@@ -10,7 +9,7 @@ if __name__ == '__main__':
 
     start =time.clock()
 
-    path_to_chrome = '/Users/Owner/Desktop/chromedriver'
+    path_to_chrome = '/Users/Dell/Desktop/chromedriver.exe'
     browser = webdriver.Chrome(executable_path = path_to_chrome);
 
     url = 'http://www.ratemyprofessors.com/search.jsp?queryBy=schoolId&schoolName=The+Ohio+State+University&schoolID=724&queryoption=TEACHER'
@@ -28,15 +27,22 @@ if __name__ == '__main__':
     i = 2;
     browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[3]/div/div/ul/li[%s]' % i).click()
 
-    # left side scroll down
-    LoadMore = browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[5]/div/div[1]')
-    browser.execute_script("arguments[0].scrollIntoView();", LoadMore)
+    # load all prof in th department
+    while(1):
+        LoadMore = browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[5]/div/div[1]')
+        # left side scroll down
+        browser.execute_script("arguments[0].scrollIntoView();", LoadMore)
+        if(LoadMore.text == 'LOAD MORE'):
+            # load more prof
+            LoadMore.click()
+        else:
+            break
 
-    if(LoadMore.is_displayed()):
-        LoadMore.click()
-
+    # get HTML source code
     text = browser.page_source
     soup = BeautifulSoup(text, 'html.parser')
+
+    # select
     names = browser.find_elements_by_class_name("result-list")
 
     for name in names:
