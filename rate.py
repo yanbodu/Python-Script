@@ -30,7 +30,7 @@ if __name__ == '__main__':
     LoadMore = browser.find_element_by_xpath('//*[@id="mainContent"]/div[1]/div/div[5]/div/div[1]')
     browser.execute_script("arguments[0].scrollIntoView();", LoadMore)
 
-    #browser.find_element_by_xpath('//*[@id="spout-header-close"]').click()
+    browser.find_element_by_xpath('//*[@id="spout-header-close"]').click()
     if(LoadMore.is_displayed()):
         LoadMore.click()
 
