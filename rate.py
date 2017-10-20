@@ -1,6 +1,4 @@
-from bs4 import BeautifulSoup
 from selenium import webdriver
-import os
 import time
 
 
@@ -42,10 +40,6 @@ if __name__ == '__main__':
             LoadMore.click()
         else:
             break
-
-    # get HTML source code
-    text = browser.page_source
-    soup = BeautifulSoup(text, 'html.parser')
 
     # select prof name
     names = browser.find_elements_by_class_name("result-list")
